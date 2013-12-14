@@ -1,0 +1,20 @@
+{
+  "name": "logci",
+  "main": "logci.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/zensh/logci.js",
+  "authors": [
+    "Yan Qing <admin@zensh.com>"
+  ],
+  "description": "Lightweight logging and reporting for JavaScript",
+  "keywords": [
+    "log"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ]
+}

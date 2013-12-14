@@ -1,0 +1,39 @@
+{
+  "name": "logci",
+  "description": "Lightweight logging and reporting for JavaScript",
+  "version": "0.1.0",
+  "homepage": "https://github.com/zensh/logci",
+  "authors": [
+    "Yan Qing <admin@zensh.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zensh/logci.git"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/zensh/logci/blob/master/LICENSE"
+    }
+  ],
+  "main": "logci.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-jshint": "~0.7.2",
+    "grunt-contrib-connect": "~0.5.0"
+  },
+  "keywords": [
+    "log",
+    "logger",
+    "logging",
+    "browser"
+  ]
+}
