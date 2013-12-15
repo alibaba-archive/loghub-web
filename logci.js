@@ -1,5 +1,5 @@
 'use strict';
-/*global module, define, console*/
+/*global module, require, Error, define, console*/
 /*
  * logci - https://github.com/zensh/logci
  *
@@ -7,8 +7,9 @@
  * Licensed under the MIT license.
  */
 
-(function () {
+(function (undefined) {
   var hasOwn = Object.prototype.hasOwnProperty,
+    HOST = 'logci.com',
     _console = console || {},
     _slient = {},
     _report = {},
@@ -20,23 +21,18 @@
     };
 
   function noop() {}
-
   function isObject(obj) {
     return typeof obj === 'object';
   }
-
   function isFunction(fn) {
     return typeof fn === 'function';
   }
-
   function isString(str) {
     return typeof str === 'string';
   }
-
   function isDefined(obj) {
     return typeof obj !== 'undefined';
   }
-
   function each(obj, iterator, context) {
     for (var key in obj) {
       if (hasOwn.call(obj, key)) {
@@ -66,9 +62,51 @@
     }
   }
 
-  function report(messages, type) {
-    if (logOptions.space && logOptions.token) {
-      _console.error(messages, type);  //TODO
+  function toJSON(err, logType) {
+    if (err) {
+      if (!isObject(err)) {
+        err = new Error(err);
+        err.name = 'LogCI';
+      }
+      if (err instanceof Error) {
+        err.name = err.name;
+        err.message = err.message;
+        err.stack = err.stack || err.description || undefined;
+        delete err.domain;
+      }
+      err.logType = logType;
+      try {
+        err = JSON.stringify(err);
+      } catch (e) {}
+      return isString(err) ? err : '';
+    }
+  }
+
+  function toURL(params) {
+    var url = '';
+    if (params && logOptions.space && logOptions.token) {
+      url += document && 'https:' === document.location.protocol ? 'https://' : 'http://';
+      url += HOST + '/' + logOptions.space;
+      url += '?token=' + logOptions.token;
+      url += '&log=' + encodeURIComponent(params);
+    }
+    return url;
+  }
+
+  function request(url) { // bowers request
+    if (Image) {
+      var img = new Image();
+      img.onload = img.onerror = img.abort = function () {
+        img = img.onload = img.onerror = img.abort = null;
+      };
+      img.src = url;
+    }
+  }
+
+  function report(err, type) {
+    err = toJSON(err, type);
+    if (err) {
+      request(toURL(err));
     }
   }
 
@@ -76,11 +114,11 @@
     if (isFunction(obj)) {
       try {
         obj();
-      } catch (error) {
+      } catch (err) {
         logci.error(err, 'error');
       }
     } else if (isObject(obj)) {
-      setOptions(obj)
+      setOptions(obj);
     }
   }
 
@@ -92,7 +130,7 @@
       if (!_slient[method]) {
         _console[method].apply(_console, arguments);
       }
-      if (_report[method] && arguments[0]) {
+      if (_report[method]) {
         report(arguments[0], isString(arguments[1]) ? arguments[1] : method);
       }
     };
@@ -100,11 +138,10 @@
   _report.error = true;
 
   if (typeof module === 'object' && module.exports) {
+    request = require('./lib/node_request.js'); // node server request
     module.exports = logci;
   } else if (typeof define === 'function' && define.amd) {
-    define(function () {
-      return logci;
-    });
+    define(function () {return logci;});
   }
   if (typeof window === 'object') {
     window.logci = logci;

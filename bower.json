@@ -1,7 +1,7 @@
 {
   "name": "logci",
-  "main": "logci.js",
-  "version": "0.1.0",
+  "main": "logci.min.js",
+  "version": "0.2.0",
   "homepage": "https://github.com/zensh/logci.js",
   "authors": [
     "Yan Qing <admin@zensh.com>"

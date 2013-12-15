@@ -2,7 +2,7 @@
 
 module.exports = function (grunt) {
 
-    // Project configuration.
+  // Project configuration.
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
@@ -19,7 +19,7 @@ module.exports = function (grunt) {
         src: 'Gruntfile.js'
       },
       logci: {
-        src: 'logci.js'
+        src: ['logci.js', 'lib/*.js']
       },
       test: {
         src: ['test/*.js']
