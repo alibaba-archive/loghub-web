@@ -34,20 +34,24 @@ module.exports = function (grunt) {
         dest: '<%= pkg.name %>.min.js'
       }
     },
-    connect: {
-      test: {
-        port: 8000,
-        keepalive: true
+    jasmine: {
+      logci: {
+        src: 'logci.js',
+        options: {
+          specs: 'test/jasmine_test.js'
+        }
       }
-    }
+    },
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
 
   // Build a distributable release
   grunt.registerTask('build', ['jshint', 'uglify']);
+  grunt.registerTask('test', ['jasmine']);
+  grunt.registerTask('default', ['jshint', 'uglify', 'jasmine']);
 
 };

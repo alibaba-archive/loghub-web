@@ -1,4 +1,4 @@
-LogCI (*Log Cloud Index*)
+LogCI (*Log Cloud Index*)[![Build Status](https://travis-ci.org/zensh/logci.png?branch=master)](https://travis-ci.org/zensh/logci)
 ===
 
 LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有两大功能：
@@ -53,7 +53,7 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
             log: false,  //false为不同步
             info: false,
             warn: false,
-            error: true  //默认同步error记录
+            error: false
         },
     }
 
@@ -74,7 +74,7 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
 
 ### `logci.error([data], [...])`
 
-默认行为同`console.error([data], [...])`，如果云同步可用，会将记录同步到云服务器。你可以通过全局配置控制它是否打印记录，是否将记录同步到云服务器。
+默认行为同`console.error([data], [...])`，但可以通过全局配置控制它是否打印记录，是否将记录同步到云服务器。
 
 
 ### `logci.log([data], [...])`

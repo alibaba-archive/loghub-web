@@ -115,7 +115,7 @@
       try {
         obj();
       } catch (err) {
-        logci.error(err, 'error');
+        logci.error(err);
       }
     } else if (isObject(obj)) {
       setOptions(obj);
@@ -135,7 +135,6 @@
       }
     };
   });
-  _report.error = true;
 
   if (typeof module === 'object' && module.exports) {
     request = require('./lib/node_request.js'); // node server request
