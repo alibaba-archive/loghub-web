@@ -136,6 +136,9 @@
     };
   });
 
+  _slient.windowError = false;
+  _report.windowError = false;
+
   if (typeof module === 'object' && module.exports) {
     request = require('./lib/node_request.js'); // node server request
     module.exports = logci;
@@ -144,5 +147,19 @@
   }
   if (typeof window === 'object') {
     window.logci = logci;
+    var _onerror = window.onerror;
+    window.onerror = function (message, url, line, col, error) {
+      if (_report.windowError) {
+        report(error || {
+          name: message.match(/([A-Z]){1}\w+Error/)[0] || message,
+          message: message,
+          stack: message + '\n at '+ url + ':' + line
+        }, 'windowError');
+      }
+      if (isFunction(_onerror)) {
+        _onerror(message, url, line, col, error);
+      }
+      return _slient.windowError;
+    };
   }
 })();
