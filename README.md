@@ -48,14 +48,14 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
             info: false,
             warn: false,
             error: false,
-            windowError: false  //true为使用window.onerror屏蔽错误
+            globalError: false  //true为使用window.onerror屏蔽错误
         },
         report: {  //同步记录到云服务器
             log: false,  //false为不同步
             info: false,
             warn: false,
             error: false,
-            windowError: false  //true为将window.onerror捕捉的错误同步
+            globalError: false  //true为将window.onerror捕捉的错误同步
         },
     }
 

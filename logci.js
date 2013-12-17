@@ -7,7 +7,7 @@
  * Licensed under the MIT license.
  */
 
-(function (undefined) {
+(function () {
   var hasOwn = Object.prototype.hasOwnProperty,
     HOST = 'logci.com',
     _console = console || {},
@@ -71,7 +71,7 @@
       if (err instanceof Error) {
         err.name = err.name;
         err.message = err.message;
-        err.stack = err.stack || err.description || undefined;
+        err.stack = err.stack || err.description;
         delete err.domain;
       }
       err.logType = logType;
@@ -136,8 +136,8 @@
     };
   });
 
-  _slient.windowError = false;
-  _report.windowError = false;
+  _slient.globalError = false;
+  _report.globalError = false;
 
   if (typeof module === 'object' && module.exports) {
     request = require('./lib/node_request.js'); // node server request
@@ -147,19 +147,15 @@
   }
   if (typeof window === 'object') {
     window.logci = logci;
-    var _onerror = window.onerror;
     window.onerror = function (message, url, line, col, error) {
-      if (_report.windowError) {
+      if (_report.globalError) {
         report(error || {
-          name: message.match(/([A-Z]){1}\w+Error/)[0] || message,
+          name: message.match(/\b([A-Z]){1}\w+Error/)[0] || message,
           message: message,
-          stack: message + '\n at '+ url + ':' + line
-        }, 'windowError');
+          stack: message + '\n    at '+ url + ':' + line
+        }, 'globalError');
       }
-      if (isFunction(_onerror)) {
-        _onerror(message, url, line, col, error);
-      }
-      return _slient.windowError;
+      return _slient.globalError;
     };
   }
 })();

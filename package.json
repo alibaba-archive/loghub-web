@@ -1,7 +1,7 @@
 {
   "name": "logci",
   "description": "Lightweight logging and reporting for JavaScript",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "https://github.com/zensh/logci",
   "authors": [
     "Yan Qing <admin@zensh.com>"
