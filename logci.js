@@ -66,7 +66,6 @@
     if (err) {
       if (!isObject(err)) {
         err = new Error(err);
-        err.name = 'LogCI';
       }
       if (err instanceof Error) {
         err.name = err.name;
@@ -86,7 +85,7 @@
     var url = '';
     if (params && logOptions.space && logOptions.token) {
       url += document && 'https:' === document.location.protocol ? 'https://' : 'http://';
-      url += HOST + '/' + logOptions.space;
+      url += HOST + '/log/' + logOptions.space;
       url += '?token=' + logOptions.token;
       url += '&log=' + encodeURIComponent(params);
     }
