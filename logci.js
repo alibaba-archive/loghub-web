@@ -3,17 +3,16 @@
 /*
  * logci - https://github.com/zensh/logci
  *
- * Copyright (c) 2013 Yan Qing
  * Licensed under the MIT license.
  */
 
 (function () {
   var hasOwn = Object.prototype.hasOwnProperty,
-    HOST = 'logci.com',
     _console = console || {},
     _slient = {},
     _report = {},
-    logOptions = {
+    _options = {
+      host: 'logci.com',
       space: '',
       token: '',
       slient: _slient,
@@ -42,8 +41,9 @@
   }
 
   function setOptions(options) {
-    logOptions.space = options.space || logOptions.space;
-    logOptions.token = options.token || logOptions.token;
+    _options.host = options.host || _options.host;
+    _options.space = options.space || _options.space;
+    _options.token = options.token || _options.token;
     if (isObject(options.slient)) {
       each(_slient, function (value, key) {
         value = options.slient[key];
@@ -62,7 +62,7 @@
     }
   }
 
-  function toJSON(err, logType) {
+  function toJSON(err, tag) {
     if (err) {
       if (!isObject(err)) {
         err = new Error(err);
@@ -73,7 +73,7 @@
         err.stack = err.stack || err.description;
         delete err.domain;
       }
-      err.logType = logType;
+      err.tag = tag;
       try {
         err = JSON.stringify(err);
       } catch (e) {}
@@ -83,10 +83,10 @@
 
   function toURL(params) {
     var url = '';
-    if (params && logOptions.space && logOptions.token) {
+    if (params && _options.space && _options.token) {
       url += document && 'https:' === document.location.protocol ? 'https://' : 'http://';
-      url += HOST + '/log/' + logOptions.space;
-      url += '?token=' + logOptions.token;
+      url += _options.host + '/' + _options.space;
+      url += '?token=' + _options.token;
       url += '&log=' + encodeURIComponent(params);
     }
     return url;
@@ -102,8 +102,8 @@
     }
   }
 
-  function report(err, type) {
-    err = toJSON(err, type);
+  function report(err, tag) {
+    err = toJSON(err, tag);
     if (err) {
       request(toURL(err));
     }
