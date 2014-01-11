@@ -13,7 +13,7 @@
     _report = {},
     _options = {
       host: 'logci.com',
-      space: '',
+      bucket: '',
       token: '',
       slient: _slient,
       report: _report
@@ -42,8 +42,11 @@
 
   function setOptions(options) {
     _options.host = options.host || _options.host;
-    _options.space = options.space || _options.space;
+    _options.bucket = options.bucket || _options.bucket;
     _options.token = options.token || _options.token;
+    if (isFunction(options.request)) {
+      _options.request = options.request;
+    }
     if (isObject(options.slient)) {
       each(_slient, function (value, key) {
         value = options.slient[key];
@@ -62,37 +65,36 @@
     }
   }
 
-  function toJSON(err, tag) {
-    if (err) {
-      if (!isObject(err)) {
-        err = new Error(err);
+  function toJSON(log, tag) {
+    if (log) {
+      if (!isObject(log)) {
+        log = new Error(log);
       }
-      if (err instanceof Error) {
-        err.name = err.name;
-        err.message = err.message;
-        err.stack = err.stack || err.description;
-        delete err.domain;
+      if (log instanceof Error) {
+        log.name = log.name;
+        log.message = log.message;
+        log.stack = log.stack || log.description;
+        delete log.domain;
       }
-      err.tag = tag;
+      log.tag = tag;
       try {
-        err = JSON.stringify(err);
+        log = JSON.stringify(log);
       } catch (e) {}
-      return isString(err) ? err : '';
+      return isString(log) ? log : '';
     }
   }
 
   function toURL(params) {
     var url = '';
-    if (params && _options.space && _options.token) {
+    if (params && _options.bucket && _options.token) {
       url += document && 'https:' === document.location.protocol ? 'https://' : 'http://';
-      url += _options.host + '/' + _options.space;
-      url += '?token=' + _options.token;
+      url += _options.host + '/?bucket=' + _options.bucket + '&token=' + _options.token;
       url += '&log=' + encodeURIComponent(params);
     }
     return url;
   }
 
-  function request(url) { // bowers request
+  function request(url) { // request for bowers
     if (Image) {
       var img = new Image();
       img.onload = img.onerror = img.abort = function () {
@@ -102,10 +104,10 @@
     }
   }
 
-  function report(err, tag) {
-    err = toJSON(err, tag);
-    if (err) {
-      request(toURL(err));
+  function report(log, tag) {
+    log = toJSON(log, tag);
+    if (log) {
+      (_options.request || request)(toURL(log));
     }
   }
 
@@ -135,8 +137,7 @@
     };
   });
 
-  _slient.globalError = false;
-  _report.globalError = false;
+  _slient.globalError = _report.globalError = false;
 
   if (typeof module === 'object' && module.exports) {
     request = require('./lib/node_request.js'); // node server request
@@ -149,7 +150,7 @@
     window.onerror = function (message, url, line, col, error) {
       if (_report.globalError) {
         report(error || {
-          name: message.match(/\b([A-Z]){1}\w+Error/)[0] || message,
+          name: (message.match(/\b([A-Z]){1}\w+Error|\bError/) || [])[0] || message,
           message: message,
           stack: message + '\n    at '+ url + ':' + line
         }, 'globalError');

@@ -41,8 +41,9 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
 配置LogCI，optionsObj是一个`object`，默认配置及说明如下：
 
     optionsObj = {
-        space: '',  //云服务器存储空间名称，如'logci'，空则不同步
-        token: '',  //云服务器访问认证，base64字符串，空或错误认证则不同步
+        host: 'logci.com',  //string, 可选，服务器访问地址
+        bucket: '',  //string, 云服务器存储空间名称，如'logci'，空则不同步
+        token: '',  //string, 云服务器访问认证，base64字符串，空或错误认证则不同步
         slient: {  //禁止打印记录
             log: false,  //false为允许log方法
             info: false,
@@ -57,6 +58,7 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
             error: false,
             globalError: false  //true为将window.onerror捕捉的错误同步
         },
+        request: null  //function, 可选，服务器访问方法，已内置针对浏览器和node.js环境的request函数
     }
 
 你随时可以调用logci(optionsObj)修改配置，optionsObj将merge到原有配置，如在生产版中禁止log，info，warn打印，仅允许error：
