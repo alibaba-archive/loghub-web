@@ -11,6 +11,7 @@
     _console = console || {},
     _slient = {},
     _report = {},
+    _request = noop,
     _options = {
       host: 'logci.com',
       bucket: '',
@@ -32,14 +33,31 @@
   function isDefined(obj) {
     return typeof obj !== 'undefined';
   }
+
+  /**
+   * simple `each` function for object or array.
+   *
+   * @param {Object|Array} obj Object to iterate over.
+   * @param {Function} iterator Iterator function.
+   * @param {Object=} context Object to become context (`this`) for the iterator function.
+   * @return {Object|Array} Reference to `obj`.
+   * @api private
+   */
   function each(obj, iterator, context) {
     for (var key in obj) {
       if (hasOwn.call(obj, key)) {
         iterator.call(context, obj[key], key, obj);
       }
     }
+    return obj;
   }
 
+  /**
+   * Merge options to `_options`.
+   *
+   * @param {Object} options
+   * @api private
+   */
   function setOptions(options) {
     _options.host = options.host || _options.host;
     _options.bucket = options.bucket || _options.bucket;
@@ -65,6 +83,14 @@
     }
   }
 
+  /**
+   * Format `log` to JSON string.
+   *
+   * @param {*} log
+   * @param {String} tag, tag of log
+   * @return {String}
+   * @api private
+   */
   function toJSON(log, tag) {
     if (log) {
       if (!isObject(log)) {
@@ -80,37 +106,62 @@
       try {
         log = JSON.stringify(log);
       } catch (e) {}
-      return isString(log) ? log : '';
     }
+    return isString(log) ? log : '';
   }
 
-  function toURL(params) {
+  /**
+   * generate a request URL.
+   *
+   * @param {String} log, log to report
+   * @return {String}
+   * @api private
+   */
+  function toURL(log) {
     var url = '';
-    if (params && _options.bucket && _options.token) {
+    if (log && _options.bucket && _options.token) {
       url += document && 'https:' === document.location.protocol ? 'https://' : 'http://';
-      url += _options.host + '/?bucket=' + _options.bucket + '&token=' + _options.token;
-      url += '&log=' + encodeURIComponent(params);
+      url += _options.host + '/ci?bucket=' + _options.bucket + '&token=' + _options.token;
+      url += '&log=' + encodeURIComponent(log);
     }
     return url;
   }
 
-  function request(url) { // request for bowers
-    if (Image) {
-      var img = new Image();
-      img.onload = img.onerror = img.abort = function () {
-        img = img.onload = img.onerror = img.abort = null;
-      };
-      img.src = url;
-    }
+  /**
+   * request funciton for browser.
+   *
+   * @param {String} url, url contained log
+   * @api private
+   */
+  function browser_request(url) {
+    var img = new Image();
+    img.onload = img.onerror = img.abort = function () {
+      img = img.onload = img.onerror = img.abort = null;
+    };
+    img.src = url;
   }
 
+  /**
+   * report log to server.
+   *
+   * @param {*} log
+   * @param {String} tag
+   * @api private
+   */
   function report(log, tag) {
-    log = toJSON(log, tag);
+    log = toURL(toJSON(log, tag));
     if (log) {
-      (_options.request || request)(toURL(log));
+      (_options.request || _request)(log);
     }
   }
 
+  /**
+   * main function.
+   *
+   * @param {Function|Object} if obj is a function, run it in try catch,
+   * if obj is a object, it will be merge as options
+   * @api public
+   */
   function logci(obj) {
     if (isFunction(obj)) {
       try {
@@ -123,6 +174,10 @@
     }
   }
 
+  /**
+   * generate logci.log, logci.info, logci.warn, logci.error, and set default options.
+   *
+   */
   each(['log', 'info', 'warn', 'error'], function (method) {
     _console[method] = isFunction(_console[method]) ? _console[method] : noop;
     _slient[method] = false;
@@ -139,13 +194,8 @@
 
   _slient.globalError = _report.globalError = false;
 
-  if (typeof module === 'object' && module.exports) {
-    request = require('./lib/node_request.js'); // node server request
-    module.exports = logci;
-  } else if (typeof define === 'function' && define.amd) {
-    define(function () {return logci;});
-  }
   if (typeof window === 'object') {
+    _request = browser_request;
     window.logci = logci;
     window.onerror = function (message, url, line, col, error) {
       if (_report.globalError) {
@@ -157,5 +207,11 @@
       }
       return _slient.globalError;
     };
+  }
+  if (typeof module === 'object' && module.exports) {
+    _request = require('./lib/node_request.js'); // node server request
+    module.exports = logci;
+  } else if (typeof define === 'function' && define.amd) {
+    define(function () {return logci;});
   }
 })();

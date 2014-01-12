@@ -6,10 +6,11 @@ module.exports = function (grunt) {
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
-    banner: '/*! <%= pkg.name %> - v<%= pkg.version %>' +
-            ' - <%= pkg.homepage %>' +
-            ' - (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>' +
-            ' - licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
+    banner: '/* <%= pkg.name %> - v<%= pkg.version %>\n' +
+            ' * <%= pkg.homepage %>\n' +
+            ' * (c) <%= grunt.template.today("yyyy") %> <%= pkg.authors %>\n' +
+            ' * licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n' +
+            ' */\n',
     // Task configuration.
     jshint: {
       options: {
