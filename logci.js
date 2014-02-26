@@ -62,6 +62,7 @@
     _options.host = options.host || _options.host;
     _options.bucket = options.bucket || _options.bucket;
     _options.token = options.token || _options.token;
+    _options.reportHook = options.reportHook || _options.reportHook;
     if (isFunction(options.request)) {
       _options.request = options.request;
     }
@@ -149,6 +150,9 @@
    * @api private
    */
   function report(log, tag) {
+    if (isFunction(_options.reportHook)) {
+      log = _options.reportHook(log, tag);
+    }
     log = toURL(toJSON(log, tag));
     if (log) {
       (_options.request || _request)(log);
