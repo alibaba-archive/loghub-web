@@ -15,7 +15,7 @@
     _options = {
       host: 'logci.com',
       bucket: '',
-      token: '',
+      appkey: '',
       slient: _slient,
       report: _report
     };
@@ -61,7 +61,7 @@
   function setOptions(options) {
     _options.host = options.host || _options.host;
     _options.bucket = options.bucket || _options.bucket;
-    _options.token = options.token || _options.token;
+    _options.appkey = options.appkey || _options.appkey;
     _options.reportHook = options.reportHook || _options.reportHook;
     if (isFunction(options.request)) {
       _options.request = options.request;
@@ -120,9 +120,9 @@
    */
   function toURL(log) {
     var url = '';
-    if (log && _options.bucket && _options.token) {
+    if (log && _options.bucket && _options.appkey) {
       url += document && 'https:' === document.location.protocol ? 'https://' : 'http://';
-      url += _options.host + '/ci?bucket=' + _options.bucket + '&token=' + _options.token;
+      url += _options.host + '/ci?bucket=' + _options.bucket + '&appkey=' + _options.appkey;
       url += '&log=' + encodeURIComponent(log);
     }
     return url;
@@ -200,6 +200,7 @@
 
   if (typeof window === 'object') {
     _request = browser_request;
+    var _onerror = isFunction(window.onerror) ? window.onerror : noop;
     window.logci = logci;
     window.onerror = function (message, url, line, col, error) {
       if (_report.globalError) {
@@ -209,6 +210,7 @@
           stack: message + '\n    at '+ url + ':' + line
         }, 'globalError');
       }
+      _onerror.apply(null, arguments);
       return _slient.globalError;
     };
   }
@@ -216,6 +218,6 @@
     _request = require('./lib/node_request.js'); // node server request
     module.exports = logci;
   } else if (typeof define === 'function' && define.amd) {
-    define(function () {return logci;});
+    define([], function () {return logci;});
   }
 })();

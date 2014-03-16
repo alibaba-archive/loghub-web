@@ -43,7 +43,7 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
     optionsObj = {
         host: 'logci.com',  //string, 可选，服务器访问地址
         bucket: '',  //string, 云服务器存储空间名称，如'logci'，空则不同步
-        token: '',  //string, 云服务器访问认证，base64字符串，空或错误认证则不同步
+        appkey: '',  //string, 云服务器访问认证，base64字符串，空或错误认证则不同步
         slient: {  //禁止打印记录
             log: false,  //false为允许log方法
             info: false,
