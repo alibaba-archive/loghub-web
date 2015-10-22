@@ -1,34 +1,29 @@
 {
-  "name": "logci",
+  "name": "loghub-web",
   "description": "Lightweight logging and reporting for JavaScript",
-  "version": "0.4.3",
-  "homepage": "https://github.com/zensh/logci",
+  "version": "0.1.0",
+  "homepage": "https://github.com/teambition/loghub-web",
   "authors": [
     "Yan Qing <admin@zensh.com>"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/zensh/logci.git"
+    "url": "git://github.com/teambition/loghub-web.git"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/zensh/logci/blob/master/LICENSE"
+      "url": "https://github.com/teambition/loghub-web/blob/master/LICENSE"
     }
   ],
-  "main": "logci.js",
-  "engines": {
-    "node": ">= 0.8.0"
-  },
+  "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "standard && mocha"
   },
   "dependencies": {},
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.4",
-    "grunt-contrib-jshint": "~0.7.2",
-    "grunt-contrib-jasmine": "~0.5.2"
+    "mocha": "^2.3.3",
+    "standard": "^5.3.1"
   },
   "keywords": [
     "log",

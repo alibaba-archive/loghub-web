@@ -1,7 +1,6 @@
-LogCI (*Log Cloud Index*)[![Build Status](https://travis-ci.org/zensh/logci.png?branch=master)](https://travis-ci.org/zensh/logci)
+loghub-web
 ===
 
-LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有两大功能：
 
 1. 可控制的console，LogCI的log, info, warn, error方法是对应console方法的封装，你可以在开发版本中任意使用这些方法，便于开发，然后在生产版中配置LogCI，禁用log, info, warn, error部分或全部，不干扰生产版的运行。
 2. 日志云同步，LogCI的log, info, warn, error方法还可以将收集到的日志信息同步到云服务器（logci.com，开发中），方便进行日志分析，监控程序运行状态。在浏览器中，LogCI使用Image对象同步日志记录；在node.js中，LogCI使用http.get方法同步日志记录。
@@ -13,23 +12,23 @@ LogCI是一款轻量级的JavaScript环境下的日志管理工具。它具有�
 
 **Node.js:**
 
-    npm install logci
+    npm install loghub-web
 
 **bower:**
 
-    bower install logci
+    bower install loghub-web
 
 **Browser:**
 
-    <script src="/pathTo/logci.js"></script>
+    <script src="/pathTo/loghub-web.js"></script>
 
 **with require**
 
-    var logci = require('logci');
+    var log = require('loghub-web');
 
 **with define**
 
-    define(['logci'], function (logci) {
+    define(['loghub-web'], function (log) {
         //...
     });
 
