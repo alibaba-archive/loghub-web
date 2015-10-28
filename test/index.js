@@ -1,81 +1,87 @@
-"use strict";
-/* global logci, describe, it, expect, jasmine, spyOn */
+'use strict'
 
-describe("LogCI from a global <script> tag", function () {
-  var a = {}, b = [];
+var http = require('http')
+var sinon = require('sinon')
+var should = require('should')
 
-  it("logci is available globally", function () {
-    expect(logci).toEqual(jasmine.any(Function));
-  });
+var loghub = require('../index.js')
 
-  it("successfully log", function () {
-    spyOn(console, 'log');
-    logci.log(123, a, b);
-    expect(console.log).toHaveBeenCalledWith(123, a, b);
-  });
+describe('LogHub NodeJS API test', function () {
+  var a = 123
+  var b = { 'foo': 'bar' }
+  var c = [ 'foobar' ]
 
-  it("successfully info", function () {
-    spyOn(console, 'info');
-    logci.info(123, a, b);
-    expect(console.info).toHaveBeenCalledWith(123, a, b);
-  });
+  var httpStub = sinon.stub(http, 'get')
 
-  it("successfully warn", function () {
-    spyOn(console, 'warn');
-    logci.warn(123, a, b);
-    expect(console.warn).toHaveBeenCalledWith(123, a, b);
-  });
+  it('should log into console and report by default', function () {
+    var logStub = sinon.stub(console, 'log')
+    loghub.log(a, b, c)
+    should(logStub.withArgs(a, b, c).calledOnce).is.true
+    should(httpStub.calledOnce).is.true
+    logStub.restore()
+  })
 
-  it("successfully error", function () {
-    spyOn(console, 'error');
-    logci.error(123, a, b);
-    expect(console.error).toHaveBeenCalledWith(123, a, b);
-  });
+  it('should log error into console and report by default', function () {
+    var errorStub = sinon.stub(console, 'error')
+    loghub.error(a, b, c)
+    should(errorStub.withArgs(a, b, c).calledOnce).is.true
+    should(httpStub.calledOnce).is.true
+    errorStub.restore()
+  })
 
-  it("successfully catch error", function () {
-    var err = new Error('It is a error!');
-    spyOn(console, 'error');
-    expect(function () {
-      logci(function () {
-        throw err;
-      });
-    }).not.toThrow();
-    expect(console.error).toHaveBeenCalledWith(err);
-  });
+  it('should not log into console after supress flag is set and report', function () {
+    var logStub = sinon.stub(console, 'log')
+    loghub({ slient: { log: true } })
+    loghub.log(a, b, c)
+    should(logStub.called).is.false
+    should(httpStub.calledOnce).is.true
+    logStub.restore()
+  })
 
-  it("set options", function () {
-    logci({
-      slient:{
-        log: true,
-        info: true,
-        warn: true,
-        error: true
-      }
-    });
-  });
+  it('should not log error into console after supress flag is set and report', function () {
+    var errorStub = sinon.stub(console, 'error')
+    loghub({ slient: { error: true } })
+    loghub.error(a, b, c)
+    should(errorStub.called).is.false
+    should(httpStub.calledOnce).is.true
+    errorStub.restore()
+  })
 
-  it("slient log", function () {
-    spyOn(console, 'log');
-    logci.log(123, a, b);
-    expect(console.log).not.toHaveBeenCalled();
-  });
+  it('should not report log after suppress flag is set and not log into console', function () {
+    var logStub = sinon.stub(console, 'log')
+    loghub({ report: { log: false } })
+    loghub.log(a, b, c)
+    should(logStub.called).is.false
+    should(httpStub.called).is.false
+    logStub.restore()
+  })
 
-  it("slient info", function () {
-    spyOn(console, 'info');
-    logci.info(123, a, b);
-    expect(console.info).not.toHaveBeenCalled();
-  });
+  it('should not report error after suppress flag is set and not log into console', function () {
+    var errorStub = sinon.stub(console, 'error')
+    loghub({ report: { error: false } })
+    loghub.error(a, b, c)
+    should(errorStub.called).is.false
+    should(httpStub.called).is.false
+    errorStub.restore()
+  })
 
-  it("slient warn", function () {
-    spyOn(console, 'warn');
-    logci.warn(123, a, b);
-    expect(console.warn).not.toHaveBeenCalled();
-  });
+  it('should not report but log into console after flag is set', function () {
+    var logStub = sinon.stub(console, 'log')
+    loghub({ slient: { log: false } })
+    loghub.log(a, b, c)
+    should(logStub.withArgs(a, b, c).calledOnce).is.true
+    should(httpStub.called).is.false
+    logStub.restore()
+  })
 
-  it("slient error", function () {
-    spyOn(console, 'error');
-    logci.error(123, a, b);
-    expect(console.error).not.toHaveBeenCalled();
-  });
+  it('should not report but log error into console after flag is set', function () {
+    var errorStub = sinon.stub(console, 'error')
+    loghub({ slient: { error: false } })
+    loghub.error(a, b, c)
+    should(errorStub.withArgs(a, b, c).calledOnce).is.true
+    should(httpStub.called).is.false
+    errorStub.restore()
+  })
 
-});
+  httpStub.restore()
+})

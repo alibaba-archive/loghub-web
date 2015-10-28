@@ -1,10 +1,11 @@
 {
   "name": "loghub-web",
   "main": "index.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/teambition/loghub-web",
   "authors": [
-    "Yan Qing <admin@zensh.com>"
+    "Yan Qing <admin@zensh.com>",
+    "Sunny <ratsunny@gmail.com>"
   ],
   "description": "Lightweight logging and reporting for JavaScript",
   "keywords": [

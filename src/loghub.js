@@ -18,115 +18,103 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-'use strict';
-
 ;(function (root, factory) {
-  'use strict';
-  if (typeof module === 'object' && module.exports) module.exports = factory();else if (typeof define === 'function' && define.amd) define([], factory);else root.loghub = factory();
-})(typeof window === 'object' ? window : undefined, function () {
-  'use strict';
+  'use strict'
+  if (typeof module === 'object' && module.exports) module.exports = factory()
+  else if (typeof define === 'function' && define.amd) define([], factory)
+  else root.loghub = factory()
+})(typeof window === 'object' ? window : this, function () {
+  'use strict'
 
   // Default config
-  var _options = {
+  let _options = {
     token: '',
     host: 'logci.com/ci',
     request: null,
     reportHook: null,
     report: { log: true, error: true, globalError: true },
     slient: { log: false, error: false, globalError: false }
-  };
+  }
 
   // Some helper
-  var _isString = function _isString(o) {
-    return typeof o === 'string';
-  };
-  var _isObject = function _isObject(o) {
-    return typeof o === 'object' && !Array.isArray(o);
-  };
-  var _isFunction = function _isFunction(o) {
-    return Object.prototype.toString.call(o) === '[object Function]';
-  };
+  let _isString = o => typeof o === 'string'
+  let _isObject = o => typeof o === 'object' && !Array.isArray(o)
+  let _isFunction = o => Object.prototype.toString.call(o) === '[object Function]'
 
   // Object recursive assignment
-  var _setOptions = function _setOptions(dest, src) {
-    for (var key in src) {
-      if (!(key in dest && Object.prototype.hasOwnProperty.call(src, key))) continue;
+  let _setOptions = function (dest, src) {
+    for (let key in src) {
+      if (!(key in dest && Object.prototype.hasOwnProperty.call(src, key))) continue
       if (_isObject(src[key]) && _isObject(dest[key])) {
-        _setOptions(dest[key], src[key]);
+        _setOptions(dest[key], src[key])
       } else {
-        dest[key] = src[key];
+        dest[key] = src[key]
       }
     }
-  };
+  }
 
   // Convert log and tag to standard format
-  var _toJSON = function _toJSON(log, tag) {
+  let _toJSON = function (log, tag) {
     if (log) {
       try {
         // To prevent log is a read-only object
-        log = JSON.parse(JSON.stringify(log));
+        log = JSON.parse(JSON.stringify(log))
       } catch (e) {}
       if (!_isObject(log)) {
-        log = new Error(log);
+        log = new Error(log)
       }
-      log.tag = tag;
+      log.tag = tag
       try {
-        log = JSON.stringify(log);
+        log = JSON.stringify(log)
       } catch (e) {}
     }
-    return _isString(log) ? log : '';
-  };
+    return _isString(log) ? log : ''
+  }
 
   // Generate report URL
-  var _toURL = function _toURL(log) {
-    var url = '';
+  let _toURL = function (log) {
+    let url = ''
     if (log) {
-      url += document.location.protocol === 'https:' ? 'https://' : 'http://';
-      url += _options.host + '?log=' + encodeURIComponent(log);
+      url += document.location.protocol === 'https:' ? 'https://' : 'http://'
+      url += _options.host + '?log=' + encodeURIComponent(log)
       if (_options.token) {
-        url += '&token=' + encodeURIComponent(_options.token);
+        url += '&token=' + encodeURIComponent(_options.token)
       }
     }
-    return url;
-  };
+    return url
+  }
 
   // Send request
-  var _request = function _request(url) {
-    if (!url) {
-      return;
-    }
-    var img = new window.Image();
+  let _request = function (url) {
+    if (!url) { return }
+    let img = new window.Image()
     img.onload = img.onerror = img.abort = function () {
-      img = img.onload = img.onerror = img.abort = null;
-    };
-    img.src = url;
-  };
+      img = img.onload = img.onerror = img.abort = null
+    }
+    img.src = url
+  }
 
   // Report other things
-  var _report = function _report(log, tag) {
+  let _report = function (log, tag) {
     if (_isFunction(_options.reportHook)) {
-      log = _options.reportHook(log);
+      log = _options.reportHook(log)
     }
-    var url = _toURL(_toJSON(log, tag));
+    let url = _toURL(_toJSON(log, tag))
     if (url) {
-      (_options.request || _request)(url);
+      (_options.request || _request)(url)
     }
-  };
+  }
 
   // loghub entry point
-  var loghub = function loghub(arg) {
+  let loghub = function (arg, ...args) {
     if (_isFunction(arg)) {
       try {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        arg.call.apply(arg, [this].concat(args));
+        arg.call(this, ...args)
       } catch (err) {
-        loghub.error(err);
+        loghub.error(err)
       }
     } else {
-      _setOptions(_options, arg);
+      _setOptions(_options, arg)
     }
   }
 
@@ -134,24 +122,23 @@
   ;['log', 'error'].forEach(function (method) {
     loghub[method] = function () {
       if (!_options.slient[method] && typeof console !== 'undefined') {
-        console[method].apply(console, arguments);
+        console[method].apply(console, arguments)
       }
       if (_options.report[method]) {
-        _report(arguments, method);
+        _report(arguments, method)
       }
-    };
-  });
+    }
+  })
 
-  var _getPerformanceTiming = function _getPerformanceTiming(name) {
-    if (typeof window === 'undefined') {
-      return 0;
-    }
-    if ('performance' in window && 'timing' in window.performance && name in window.performance.timing) {
-      return window.performance.timing[name];
+  let _getPerformanceTiming = function (name) {
+    if (typeof window === 'undefined') { return 0 }
+    if ('performance' in window &&
+        'timing' in window.performance && name in window.performance.timing) {
+      return window.performance.timing[name]
     } else {
-      return 0;
+      return 0
     }
-  };
+  }
 
   // Provide fetch start time
   loghub.timing = {
@@ -162,12 +149,13 @@
     requestStart: _getPerformanceTiming('requestStart'),
     responseEnd: _getPerformanceTiming('responseEnd'),
     responseStart: _getPerformanceTiming('responseStart')
-  };
+  }
 
   // Provide current loaded entries timing info
   loghub.getEntries = function () {
-    if (typeof window !== 'undefined' && 'performance' in window && 'getEntries' in window.performance) {
-      var entries = window.performance.getEntries();
+    if (typeof window !== 'undefined' &&
+        'performance' in window && 'getEntries' in window.performance) {
+      let entries = window.performance.getEntries()
       return entries.map(function (entry) {
         return {
           'duration': entry.duration || 0,
@@ -176,12 +164,12 @@
           'name': entry.name || '',
           'startTime': entry.startTime || 0,
           'responseEnd': entry.responseEnd || 0
-        };
-      });
+        }
+      })
     } else {
-      return [];
+      return []
     }
-  };
+  }
 
   // Process global error
   if (_options.report.globalError) {
@@ -190,9 +178,9 @@
         name: (msg.match(/\b([A-Z]){1}\w+Error|\bError/) || [])[0] || msg,
         message: msg,
         stack: msg + '\n    at ' + url + ':' + line
-      }, 'globalError');
-    }, false);
+      }, 'globalError')
+    }, false)
   }
 
-  return loghub;
-});
+  return loghub
+})
