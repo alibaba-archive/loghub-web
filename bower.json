@@ -1,7 +1,7 @@
 {
   "name": "loghub-web",
   "main": "index.js",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "homepage": "https://github.com/teambition/loghub-web",
   "authors": [
     "Yan Qing <admin@zensh.com>",
@@ -15,7 +15,6 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "bower_components",
     "test"
   ]
 }
