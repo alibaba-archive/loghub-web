@@ -156,11 +156,18 @@
   }
 
   // Send request
+  var idCount = 0
+  loghub._requests = {}
+
   function request (payload) {
     if (!payload || !root.Image) return
-    var img = new root.Image()
+    var id = ++idCount
+    if (id > 2e10) idCount = 0
+
+    var img = loghub._requests[id] = new root.Image()
     img.onload = img.onerror = img.abort = function () {
       img = img.onload = img.onerror = img.abort = null
+      delete loghub._requests[id]
     }
     img.src = payload
   }
