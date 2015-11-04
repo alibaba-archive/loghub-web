@@ -55,7 +55,7 @@
           name: (msg.match(/\b([A-Z]){1}\w+Error|\bError/) || [])[0] || 'Error',
           message: msg,
           stack: msg + '\n    at ' + url + ':' + line
-        }, 'globalError')
+        }, 'CRITICAL')
       } : null
     }
     return loghub
@@ -76,12 +76,12 @@
 
   loghub.log = function (log) {
     if (!_options.slient.log) console.log(log)
-    if (_options.report.log) report(log)
+    if (_options.report.log) report(log, 'INFO')
   }
 
   loghub.error = function (log) {
     if (!_options.slient.error) console.error(log)
-    if (_options.report.error) report(errorify(log), 'error')
+    if (_options.report.error) report(errorify(log), 'ERROR')
   }
 
   // Provide current loaded entries timing info
@@ -107,12 +107,9 @@
     return Math.floor(root.performance.timing[name] || 0)
   }
 
-  function isString (str) {
-    return typeof str === 'string'
-  }
-
   function isObject (obj) {
-    return toStr.call(obj) === '[object Object]'
+    var type = toStr.call(obj)
+    return type === '[object Object]' || type === '[object Error]'
   }
 
   function isFunction (fn) {
@@ -132,22 +129,21 @@
   }
 
   // Convert log and tag to standard format
-  function toJSON (log, tag) {
-    if (isObject(log)) {
-      if (isString(tag)) log.tag = tag
-      try {
-        log = JSON.stringify(log)
-      } catch (e) {
-        log = JSON.stringify(errorify(e))
-      }
+  function toJSON (log, type) {
+    if (!isObject(log)) return console.error('Not Object:', log)
+    log.LOG_TYPE = type
+    try {
+      return JSON.stringify(log)
+    } catch (e) {
+      e.LOG_TYPE = 'ERROR'
+      return JSON.stringify(errorify(e))
     }
-    return isString(log) ? log : ''
   }
 
   // Generate report URL
   function toURL (log) {
     if (!log || !_options.host) return ''
-    var url = protocol
+    var url = /http/.test(_options.host) ? '' : protocol
     url += _options.host + '?log=' + encodeURIComponent(log)
     if (_options.token) {
       url += '&token=' + encodeURIComponent(_options.token)
@@ -173,9 +169,9 @@
   }
 
   // Report other things
-  function report (log, tag) {
-    if (!isFunction(_options.logHook)) log = toJSON(log, tag)
-    else log = _options.logHook(log, tag)
+  function report (log, type) {
+    if (!isFunction(_options.logHook)) log = toJSON(log, type)
+    else log = _options.logHook(log, type)
 
     if (!log) return
     if (!isFunction(_options.request)) request(toURL(log))
