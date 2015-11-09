@@ -1,7 +1,7 @@
 {
   "name": "loghub-web",
   "description": "Lightweight logging and reporting for JavaScript",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "homepage": "https://github.com/teambition/loghub-web",
   "authors": [
     "Yan Qing <admin@zensh.com>",
@@ -19,8 +19,6 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "^2.3.3",
-    "should": "^7.1.1",
-    "sinon": "^1.17.2",
     "standard": "^5.3.1"
   },
   "keywords": [

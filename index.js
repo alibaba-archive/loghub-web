@@ -37,7 +37,7 @@
 
   // global config
   var _options = {
-    host: '',     // logs.teambition.net/log.gif
+    host: '',     // logs.teambition.com/log.gif
     token: '',
     request: null,
     logHook: null,
@@ -51,6 +51,10 @@
     // Process global error
     if ('onerror' in root) {
       root.onerror = _options.report.globalError ? function (msg, url, line, col, error) {
+        // ignore CORS javascript error:
+        // {name: "Error", message: "Script error.", stack: "Script error.↵    at :0"}
+        msg = (error && error.message) || msg
+        if (!msg || msg.indexOf('Script error') >= 0) return
         loghub.error(error || {
           name: (msg.match(/\b([A-Z]){1}\w+Error|\bError/) || [])[0] || 'Error',
           message: msg,
