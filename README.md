@@ -38,8 +38,6 @@ loghub-web
 options = {
   host: '',                 // 日志服务器访问地址
   token: '',                // token 验证
-  logHook: null,            // fn(log, tag) 自定义日志内容加工方法
-  request: null,            // fn(url, log) 自定义日志内容提交方法
   slient: {                 // 禁止打印记录
     log: false,             // false为允许log方法在控制台打印记录
     error: false
@@ -85,3 +83,19 @@ options = {
 `initiatorType`, `startTime` 和 `duration` 字段，
 可以用来衡量资源加载性能，如果浏览器不支持，则会返回一个空数组，如果特定字段不被支持，
 其值会被设置为 `0`。
+
+### `loghub._errorify(error)`
+
+默认的 error 标准化方法，使用者可复写。其中 error 应该为 `Error` 对象实例
+
+### `loghub._assembleLog(log, type)`
+
+默认的 log 标准化方法，使用者可复写。其中 log 应该对对象，type 是 `'INFO'` 或 `'ERROR'`
+
+### `loghub._request(log)`
+
+默认的发送 log 到 server 的请求方法，使用者可复写。
+
+### `loghub._report(log)`
+
+默认的 report 方法，使用者可复写。

@@ -39,8 +39,6 @@
   var _options = {
     host: '',     // logs.teambition.com/log.gif
     token: '',
-    request: null,
-    logHook: null,
     report: {log: true, error: true, globalError: true},
     slient: {log: false, error: false}
   }
@@ -80,12 +78,12 @@
 
   loghub.log = function (log) {
     if (!_options.slient.log) console.log(log)
-    if (_options.report.log) report(log, 'INFO')
+    if (_options.report.log) loghub._report(log, 'INFO')
   }
 
   loghub.error = function (log) {
     if (!_options.slient.error) console.error(log)
-    if (_options.report.error) report(errorify(log), 'ERROR')
+    if (_options.report.error) loghub._report(loghub._errorify(log), 'ERROR')
   }
 
   // Provide current loaded entries timing info
@@ -132,63 +130,60 @@
     }
   }
 
-  // Convert log and tag to standard format
-  function toJSON (log, type) {
-    if (!isObject(log)) return console.error('Not Object:', log)
-    log.LOG_TYPE = type
-    try {
-      return JSON.stringify(log)
-    } catch (e) {
-      e.LOG_TYPE = 'ERROR'
-      return JSON.stringify(errorify(e))
-    }
-  }
-
   // Generate report URL
   function toURL (log) {
     if (!log || !_options.host) return ''
+    try {
+      log = JSON.stringify(log)
+    } catch (e) {
+      return console.error(e)
+    }
+
     var url = /http/.test(_options.host) ? '' : protocol
     url += _options.host + '?log=' + encodeURIComponent(log)
     if (_options.token) {
-      url += '&token=' + encodeURIComponent(_options.token)
+      url += '&token=' + _options.token
     }
     return url
   }
 
-  // Send request
-  var idCount = 0
-  loghub._requests = {}
-
-  function request (payload) {
-    if (!payload || !root.Image) return
-    var id = ++idCount
-    if (id > 2e10) idCount = 0
-
-    var img = loghub._requests[id] = new root.Image()
-    img.onload = img.onerror = img.abort = function () {
-      img = img.onload = img.onerror = img.abort = null
-      delete loghub._requests[id]
-    }
-    img.src = payload
-  }
-
-  // Report other things
-  function report (log, type) {
-    if (!isFunction(_options.logHook)) log = toJSON(log, type)
-    else log = _options.logHook(log, type)
-
-    if (!log) return
-    if (!isFunction(_options.request)) request(toURL(log))
-    else _options.request(protocol + _options.host, log)
-  }
-
-  function errorify (err) {
+  loghub._errorify = function (err) {
     if (!err) return
     return {
       name: err.name || 'Error',
       message: err.message || String(err),
       stack: err.stack || null
     }
+  }
+
+  loghub._assembleLog = function (log, type) {
+    if (isObject(log)) {
+      log.LOG_TYPE = type
+      return log
+    }
+    console.error('Not Object:', log)
+  }
+
+  // Send request
+  var idCount = 0
+  loghub._requests = {}
+  loghub._request = function request (log) {
+    log = toURL(log)
+    if (!log || !root.Image) return
+
+    var id = ++idCount
+    if (id > 2e10) idCount = 0
+    var img = loghub._requests[id] = new root.Image()
+    img.onload = img.onerror = img.abort = function () {
+      img = img.onload = img.onerror = img.abort = null
+      delete loghub._requests[id]
+    }
+    img.src = log
+  }
+
+  loghub._report = function (log, type) {
+    log = loghub._assembleLog(log, type)
+    if (log) loghub._request(log)
   }
 
   return loghub()
